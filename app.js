@@ -20,6 +20,14 @@ app.get("/", function(req, res) {
 	res.render("home", {homeStartingContent: homeStartingContent, Posts:Posts});
 });
 
+app.get("/posts/:postTopic", function(req, res) {
+	for (var i=0; i<Posts.length; i++) {
+		if (Posts[i].title === req.params.postTopic) {
+			console.log("Found a match!")
+		}
+	}
+})
+
 app.get("/about", function(req, res) {
 	res.render("about", {aboutContent: aboutContent});
 });
