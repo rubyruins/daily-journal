@@ -19,6 +19,22 @@ app.use(express.static("public"));
 
 app.get("/", function(req, res) {
 	res.render("home", {homeStartingContent: homeStartingContent, Posts:Posts});
+	console.log(req.body.searchPost);
+});
+
+app.post("/", function(req, res) {
+	let reqTitle = _.lowerCase(req.body.searchPost);
+	let found = 0;
+	for (var i=0; i<Posts.length; i++) {
+		postTitle = _.lowerCase(Posts[i].title);
+		if (postTitle === reqTitle) {
+			found = 1;
+			res.render("post", {postTitle: Posts[i].title, postContent: Posts[i].content})
+		}
+	}
+	if (found === 0) {
+		res.render("404");
+	}
 });
 
 app.get("/posts/:postTopic", function(req, res) {
