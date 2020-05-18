@@ -27,62 +27,65 @@ const postSchema = {
 
 const Post = mongoose.model("Post", postSchema);
 
-app.get("/", function(req, res) {
-	Post.find({}, function(err, foundPosts) {
-		res.render("home", {homeStartingContent: homeStartingContent, Posts:foundPosts});
-		console.log(req.body.searchPost);
+app.route("/")
+	.get(function(req, res) {
+		Post.find({}, function(err, foundPosts) {
+			res.render("home", {homeStartingContent: homeStartingContent, Posts:foundPosts});
+			console.log(req.body.searchPost);
+		})
 	})
-});
-
-app.post("/", function(req, res) {
-	let reqTitle = _.lowerCase(req.body.searchPost);
-	let found = 0;
-	Post.find({}, function(err, foundPosts) {
-		for (var i=0; i<foundPosts.length; i++) {
-			let postTitle = _.lowerCase(foundPosts[i].title);
-			if (postTitle === reqTitle) {
-				found = 1;
-				res.render("post", {postTitle: foundPosts[i].title, postContent: foundPosts[i].content})
+	.post(function(req, res) {
+		let reqTitle = _.lowerCase(req.body.searchPost);
+		let found = 0;
+		Post.find({}, function(err, foundPosts) {
+			for (var i=0; i<foundPosts.length; i++) {
+				let postTitle = _.lowerCase(foundPosts[i].title);
+				if (postTitle === reqTitle) {
+					found = 1;
+					res.render("post", {postTitle: foundPosts[i].title, postContent: foundPosts[i].content})
+				}
 			}
-		}
-		if (found === 0) {
-			res.render("404");
-		}
-	})
-});
-
-app.get("/posts/:postID", function(req, res) {
-	let reqID = req.params.postID;
-	Post.findOne({_id: reqID}, function(err, post) {
-		res.render("post", {postTitle: post.title, postContent: post.content})
-	})
-});
-
-app.get("/about", function(req, res) {
-	res.render("about", {aboutContent: aboutContent});
-});
-
-app.get("/contact", function(req, res) {
-	res.render("contact", {contactContent: contactContent});
-});
-
-app.get("/compose", function(req, res) {
-	res.render("compose");
-});
-
-app.post("/compose", function(req, res) {
-	let title = req.body.postTitle;
-	let content = req.body.postContent;
-	const post = new Post({
-		title: title,
-		content: content
+			if (found === 0) {
+				res.render("404");
+			}
+		})
 	});
-	post.save(function(err) {
-		if(!err) {
-			res.redirect("/")
-		}
+
+app.route("/posts/:postID")
+	.get(function(req, res) {
+		let reqID = req.params.postID;
+		Post.findOne({_id: reqID}, function(err, post) {
+			res.render("post", {postTitle: post.title, postContent: post.content})
+		})
 	});
-});
+
+app.route("/about")
+	.get(function(req, res) {
+		res.render("about", {aboutContent: aboutContent});
+	});
+
+app.route("/contact")
+	.get(function(req, res) {
+		res.render("contact", {contactContent: contactContent});
+	});
+
+app.route("/compose")
+	.get(function(req, res) {
+		res.render("compose");
+	})
+	.post(function(req, res) {
+		let title = req.body.postTitle;
+		let content = req.body.postContent;
+		const post = new Post({
+			title: title,
+			content: content
+		});
+		post.save(function(err) {
+			if(!err) {
+				res.redirect("/")
+			}
+		});
+	});
 
 app.listen(3000, function() {
 	console.log("Server started on port 3000");
